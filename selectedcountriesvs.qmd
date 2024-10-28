@@ -1,0 +1,59 @@
+---
+title: "main visualization"
+format: html
+editor: visual
+---
+
+```{r}
+# Libraries
+library(ggplot2)
+library(dplyr)
+library(gganimate)
+
+# Load the data 
+data <- read.csv("global trends.csv")
+
+# Basic data cleaning
+cleaned_data <- data %>%
+  filter(!is.na(CO2_Emissions) & !is.na(Energy_Use) & !is.na(GDP)) %>%
+  mutate(Year = as.factor(Year))  # Making sure Year is treated as a factor
+
+# Selecting the countries i.e developed vs developing countries
+selected_countries <- c("United States", "China", "India", "Germany", "United Kingdom")
+filtered_data <- cleaned_data %>%
+  filter(Country_Name %in% selected_countries)
+
+```
+
+```{r}
+# Static scatter plot of CO2 emissions vs GDP
+ggplot(filtered_data, aes(x = GDP, y = CO2_Emissions, color = Country_Name)) +
+  geom_point(size = 3, alpha = 0.7) +
+  labs(title = "CO2 Emissions vs. GDP for Selected Countries",
+       x = "GDP (in USD)",
+       y = "CO2 Emissions (in tonnes)") +
+  theme_minimal()
+
+```
+
+```{r}
+# Animated scatter plot of CO2 emissions vs GDP over time
+p <- ggplot(filtered_data, aes(x = GDP, y = CO2_Emissions, color = Country_Name)) +
+  geom_point(size = 3, alpha = 0.7) +
+  labs(title = "CO2 Emissions vs. GDP Over Time: {closest_state}",
+       x = "GDP (in USD)",
+       y = "CO2 Emissions (in tonnes)",
+       caption = "Source: Global Trends Dataset") +
+  theme_minimal() +
+  transition_states(Year, transition_length = 2, state_length = 1) +
+  ease_aes('linear')
+
+# Save the animation (optional)
+animate(p, width = 800, height = 500)
+
+```
+
+```{r}
+animate(p, width = 800, height = 500, fps = 20, duration = 15)
+
+```

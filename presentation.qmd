@@ -1,0 +1,69 @@
+---
+title: "The Cost of Progress: Exploring the relationship between CO2 Emissions, Economic Growth and Energy Use"
+Author: Sanaz Achak, Keren Omari-Baah
+format: 
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+---
+
+# The Cost of Progress
+
+## Exploring the relationship between CO2 Emissions, Economic Growth, and Energy Use
+
+Sanaz Achak, Keren Omari-Baah October 2024
+
+##Abstract
+
+This project investigates the relationship between economic growth and carbon emissions, focusing on whether countries can decouple growth from environmental degradation. Using global data on GDP per capita and CO2 emissions per capita from [World Bank Group](https://data.worldbank.org), the analysis reveals that while high-income countries have begun to stabilize or reduce emissions even as their economies grow, middle- and low-income countries often experience rising emissions as they industrialize. A key visualization, a scatter plot segmented by income group, highlights how different stages of development influence emissions patterns. Wealthier nations show a mix of outcomes—some have successfully decoupled, while others continue to emit heavily. In contrast, developing countries face steep increases in emissions due to reliance on fossil fuels during industrialization. These insights are vital for policymakers seeking to balance economic growth with climate goals, industry professionals looking to implement sustainable practices, and students studying the intersection of economics and environmental science. A path to sustainable growth requires focusing on energy transitions, particularly increasing the share of renewables in developing economies.
+
+## Global warming
+
+-   Human emissions of greenhouse gasses are the primary drivers of climate change today.
+-   Global warming is heavily been driven by **CO2 emissions**, primarily from burning fossil fuels and the manufacture of cement. They include carbon dioxide produced during consumption of solid, liquid, and gas fuels and gas flaring.
+-   **Economic growth** and **industrialization** often lead to rising emissions.
+-   The challenge: **balance growth** with **environmental sustainability**.
+
+------------------------------------------------------------------------
+
+-   **Goal**: Explore the correlation between CO2 emissions, GDP, and energy use across economies (low, middle and high income countries).
+
+-   **Key Questions**:
+
+    1.  How do emissions track with economic growth?
+    2.  Are wealthier nations reducing their carbon emissions as they grow, or do emissions increase alongside economic growth?
+    3.  Are developing countries increasing emissions as their economies industrialize?
+    4.  Which countries have successfully decoupled economic growth from carbon emissions?
+    5.  Can we find a path to sustainable growth?
+    
+## Visualizations
+![alt text](co2.timeseries.jpeg)
+![alt text](globalco2.png)
+![alt text](selectedcountries.png)
+![alt text](co2vsenergysc.png)
+
+
+## Main Insights
+
+-   **Countries with higher GDP** tend to have **higher CO2 emissions**.
+-   Industrializing nations (e.g., China, India) are seeing **sharp rises in emissions**.
+-   Developed nations (e.g., U.S., Germany) show **slower growth in emissions**.
+
+------------------------------------------------------------------------
+
+## Correlation Findings
+
+-   Our analysis highlights the **correlation** between CO2 emissions, GDP, and energy use.
+
+-   **Strong correlation** between economic growth (GDP) and CO2 emissions.
+
+-   Energy consumption also **drives emissions**, but with regional variations.
+
+------------------------------------------------------------------------
+
+### Target audience:
+
+-   Industry Professionals: Who are they?: People working in energy, manufacturing, or industries with significant environmental impacts.
+-   Why are they interested?: Industry professionals are looking to balance profitability and sustainability. The presentation helps them understand global emissions trends and see how economic decisions can drive emissions. It also highlights strategies for decoupling growth from carbon emissions, which is crucial for industries transitioning to greener practices.
+-   Connection to the Topic: They may look for ways to implement the findings to guide corporate sustainability efforts, adopt renewable energy, and reduce emissions while still expanding economically.

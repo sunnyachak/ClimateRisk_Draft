@@ -1,0 +1,140 @@
+---
+title: "global trends-1"
+format: html
+editor: visual
+---
+
+```{r}
+#Libraries 
+
+library(tidyr)
+library(readr)
+library(ggplot2)
+```
+
+```{r}
+# Loading the dataset
+
+global_trends <- read.csv("global trends.csv", header = FALSE )
+head(global_trends)
+
+view(global_trends)
+```
+
+```{r}
+# Removing rows with missing data
+
+cleaned_data <- drop_na(global_trends)
+
+head(cleaned_data)
+
+```
+
+```{r}
+#Basic summary statistics
+summary(cleaned_data)
+
+# GPD per capita vs CO2 emissinons
+
+ggplot(cleaned_data, aes(x = GDP, y= CO2_Emissions )) +
+  geom_point() +
+  labs(title = "GDP per capita vs CO2 emmissions per Capita",
+  x="GDP per capita (USD)",
+  Y= "CO2 Emissions (Metric tons per capita)")
+
+```
+
+```{r}
+# Time series plot for Germany
+
+ggplot(subset(cleaned_data, Country_Name == "Germany"), aes(x = Year)) +
+  geom_line(aes(y = GDP, color = "GDP per Capita")) +
+  geom_line(aes(y = CO2_Emissions, color = "CO2 Emissions per Capita")) +
+  labs(title = "GDP and CO2 Emissions Trends in Germany",
+       x = "Year", y = "Value") +
+  scale_color_manual("", values = c("GDP per Capita" = "blue", "CO2 Emissions per Capita" = "red"))
+
+```
+
+```{r}
+# Global heatmap for CO2 emissions for a spefic year
+
+library(ggplot2)
+
+ggplot(cleaned_data, aes(x = Country_Name, y = Year, fill = CO2_Emissions )) +
+  geom_tile() +
+  labs(title = "Global CO2 Emissions Per Capita by Country",
+       x = "Country", y = "Year", fill = "CO2 Emissions")
+
+```
+
+```{r}
+# World map data
+
+world <- ne_countries(scale = "medium", returnclass = "sf")  # Getting world map with 'sf' (simple features) format
+
+```
+
+```{r}
+# Merging the world map with the dataset by matching country names
+
+map_data <- left_join(world, cleaned_data, by = c("name" = "Country_Name"))
+
+```
+
+```{r}
+# Plotting CO2 emissions per capita on the map
+
+ggplot(data = map_data) +
+  geom_sf(aes(fill = CO2_Emissions )) +  # Fill countries based on CO2 emissions
+  scale_fill_viridis_c(option = "plasma", trans = "log10", na.value = "grey50") +  # Use a color scale and log transformation
+  labs(title = "Global CO2 Emissions per Capita",
+       fill = "CO2 Emissions \n(Metric Tons)") +
+  theme_minimal() +  # Clean theme
+  theme(legend.position = "right")  # Legend on the right
+
+```
+
+```{r}
+ggplot(data = map_data) +
+  geom_sf(aes(fill = CO2_Emissions), color = "black", size = 0.1) +  # Adding country borders
+  scale_fill_viridis_c(option = "plasma", 
+                       trans = "log10", 
+                       na.value = "grey50",
+                       breaks = c(0.1, 1, 10, 100),
+                       labels = c("0.1", "1", "10", "100")) +  # Custom breaks for legend
+  coord_sf(crs = "+proj=robin") +  # Robinson projection for less distortion
+  labs(title = "Global CO2 Emissions per Capita (Log Scale)",
+       subtitle = "Data Source: [Insert Source Here]",
+       fill = "CO2 Emissions \n(Metric Tons per Capita)") +
+  theme_minimal() +
+  theme(legend.position = "right",
+        plot.title = element_text(size = 16, face = "bold"),
+        plot.subtitle = element_text(size = 12),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8))
+
+```
+
+```{r}
+ggplot(data = map_data) +
+  geom_sf(aes(fill = CO2_Emissions), color = "black", size = 0.1) +  # Ensuring fill aesthetic is mapped
+  scale_fill_viridis_c(option = "plasma", 
+                       trans = "log10", 
+                       na.value = "grey50",  # Ensuring missing values are handled
+                       breaks = c(0.1, 1, 10, 100),  # Define custom breaks
+                       labels = c("0.1", "1", "10", "100")) +  # Labels for the breaks
+  coord_sf(crs = "+proj=robin") +  # Robinson projection
+  labs(title = "Global CO2 Emissions per Capita (Log Scale)",
+       subtitle = "Data Source: [Insert Source Here]",
+       fill = "CO2 Emissions \n(Metric Tons per Capita)") +  # Title for the legend
+  guides(fill = guide_legend()) +  # Ensuring legend is forced to appear
+  theme_minimal() +
+  theme(legend.position = "right",  # Ensuring legend is placed on the right
+        plot.title = element_text(size = 16, face = "bold"),
+        plot.subtitle = element_text(size = 12),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8))
+
+
+```

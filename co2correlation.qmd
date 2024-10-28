@@ -1,0 +1,51 @@
+---
+title: "correlation"
+format: html
+editor: visual
+---
+
+```{r}
+# Libraries
+library(dplyr)
+library(ggplot2)
+library(gganimate)
+
+# Loading the dataset
+data <- read.csv("global trends.csv")
+
+# Data cleaning
+cleaned_data <- data %>%
+  filter(!is.na(CO2_Emissions) & !is.na(Energy_Use) & !is.na(GDP))
+
+# Selected countries
+selected_countries <- c("United States", "China", "India", "Germany", "United Kingdom")
+filtered_data <- cleaned_data %>%
+  filter(Country_Name %in% selected_countries)
+
+# Correlation Scatter Plot: CO2 Emissions vs. GDP
+ggplot(filtered_data, aes(x = GDP, y = CO2_Emissions, color = Country_Name)) +
+  geom_point(size = 3, alpha = 0.7) +
+  labs(title = "CO2 Emissions vs. GDP for Selected Countries", x = "GDP (in USD)", y = "CO2 Emissions (in tonnes)") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+# Correlation Scatter Plot: CO2 Emissions vs. Energy Use
+ggplot(filtered_data, aes(x = Energy_Use, y = CO2_Emissions, color = Country_Name)) +
+  geom_point(size = 3, alpha = 0.7) +
+  labs(title = "CO2 Emissions vs. Energy Use for Selected Countries", x = "Energy Use (kg of oil equivalent)", y = "CO2 Emissions (in tonnes)") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+# Animated Scatter Plot (CO2 Emissions vs. GDP over time)
+p <- ggplot(filtered_data, aes(x = GDP, y = CO2_Emissions, color = Country_Name)) +
+  geom_point(size = 3, alpha = 0.7) +
+  labs(title = "CO2 Emissions vs. GDP Over Time: {closest_state}", x = "GDP (in USD)", y = "CO2 Emissions (in tonnes)") +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  transition_states(Year, transition_length = 2, state_length = 1) +
+  ease_aes('linear')
+
+# Render the animation
+animate(p, width = 800, height = 500)
+
+```

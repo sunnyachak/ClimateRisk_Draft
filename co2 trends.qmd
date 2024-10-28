@@ -1,0 +1,44 @@
+---
+title: "CO2trends"
+format: html
+editor: visual
+---
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(ggplot2)
+library(gganimate)
+
+# Loading the dataset
+data <- read.csv("global trends.csv")
+
+# Cleaning the data
+cleaned_data <- data %>%
+  filter(!is.na(CO2_Emissions) | !is.na(Energy_Use) | !is.na(GDP))
+
+# Selected countries
+selected_countries <- c("United States", "China", "India", "Germany", "United Kingdom")
+filtered_data <- cleaned_data %>%
+  filter(Country_Name %in% selected_countries)
+
+# A static line plot for CO2 emissions over time
+ggplot(filtered_data, aes(x = Year, y = CO2_Emissions, color = Country_Name)) +
+  geom_line(size = 1.2) +
+  labs(title = "CO2 Emissions Trends for Selected Countries", x = "Year", y = "CO2 Emissions (in tonnes)") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+# An animated line plot for CO2 emissions over time
+p <- ggplot(filtered_data, aes(x = Year, y = CO2_Emissions, color = Country_Name, group = Country_Name)) +
+  geom_line(size = 1.2) +
+  labs(title = "CO2 Emissions Trends: {closest_state}", x = "Year", y = "CO2 Emissions (in tonnes)") +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  transition_states(Year, transition_length = 2, state_length = 1) +
+  ease_aes('linear')
+
+# Rendering the animation
+animate(p, width = 800, height = 500)
+
+```

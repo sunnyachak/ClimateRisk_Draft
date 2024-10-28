@@ -1,0 +1,275 @@
+---
+title: "DataPrep"
+format: html
+editor: visual
+---
+
+```{r}
+# Libraries
+library(dplyr)
+library(readr)
+library(tidyr)
+```
+
+```{r}
+# Loading GDP dataset
+gdp_data <- read.csv("/Users/dankwah/Documents/visualcomm/globaltrends/API_NY/gdp.csv", header = FALSE )
+
+# Removing the first two rows (metadata)
+gdp_clean <- gdp_data[-c(1,2), ]
+
+# Making the third row as headers
+colnames(gdp_clean) <- as.character(unlist(gdp_clean[1,]))
+gdp_clean <- gdp_clean[-1, ] 
+
+# Fltering irrelevant columns 
+gdp_clean <- gdp_clean %>%
+  select(Country_Name = `Country Name`, Country_Code = `Country Code`, `1960`:`2023`)
+# 'Indicator Name' and 'Indicator Code' were dropped
+
+# Making 'Year' a column and 'Value' the actual gdp data
+gdp_long <- gdp_clean %>%
+  pivot_longer(cols = `1960`:`2023`, names_to = "Year", values_to = "Value")
+
+# Converting 'Year' to numeric 
+gdp_long$Year <- as.numeric(gdp_long$Year)
+
+# Viewing the first few rows of the cleaned  data
+head(gdp_long)
+```
+
+```{r}
+# Loading co2 emissions dataset
+co2_data <- read.csv("/Users/dankwah/Documents/visualcomm/globaltrends/API_EN/co2_emissions.csv", header = FALSE)
+
+# Removing the first two rows (metadata)
+co2_clean <- co2_data[-c(1,2), ]
+
+# Making the third row as headers
+colnames(co2_clean) <- as.character(unlist(co2_clean[1,]))
+co2_clean <- co2_clean[-1, ] 
+
+# Fltering irrelevant columns 
+co2_clean <- co2_clean %>%
+  select(Country_Name = `Country Name`, Country_Code = `Country Code`, `1960`:`2023`)
+# 'Indicator Name' and 'Indicator Code' were dropped
+
+# Making 'Year' a column and 'Value' the actual co2 emissions data
+co2_long <- co2_clean %>%
+  pivot_longer(cols = `1960`:`2023`, names_to = "Year", values_to = "Value")
+
+# Converting 'Year' to numeric 
+co2_long$Year <- as.numeric(co2_long$Year)
+
+# Viewing the first few rows of the cleaned  data
+head(co2_long)
+```
+
+```{r}
+# Loading energy use dataset
+energy_data <-read.csv("/Users/dankwah/Documents/visualcomm/globaltrends/API_EG/energy_use.csv", header = FALSE)
+
+# Removing the first two rows (metadata)
+energy_clean <- energy_data[-c(1,2), ]
+
+# Removing the first two rows (metadata)
+energy_clean <- energy_data[-c(1,2), ]
+
+# Making the third row as headers
+colnames(energy_clean) <- as.character(unlist(energy_clean[1,]))
+energy_clean <- energy_clean[-1, ] 
+
+# Fltering irrelevant columns 
+energy_clean <- energy_clean %>%
+  select(Country_Name = `Country Name`, Country_Code = `Country Code`, `1960`:`2023`)
+# 'Indicator Name' and 'Indicator Code' were dropped
+
+# Making 'Year' a column and 'Value' the actual gdp data
+energy_long <- energy_clean %>%
+  pivot_longer(cols = `1960`:`2023`, names_to = "Year", values_to = "Value")
+
+# Converting 'Year' to numeric 
+energy_long$Year <- as.numeric(energy_long$Year)
+
+# Viewing the first few rows of the cleaned  data
+head(energy_long)
+
+```
+
+```{r}
+# Replacing missing values with the mean 
+data$energy_long <- ifelse(is.na(data$energy_long), mean(data$energy_long, na.rm = TRUE), data$energy_long)
+data$gdp_long <- ifelse(is.na(data$gdp_long), mean(data$gdp_long, na.rm = TRUE), data$gdp_long)
+data$co2_long <- ifelse(is.na(data$co2_long), mean(data$co2_long, na.rm = TRUE), data$co2_long)
+
+```
+
+```{r}
+#Merging all three datasets by Country Name, Country Code, and Year
+merged_data <- gdp_long %>%
+  inner_join(co2_long, by = c("Country_Name", "Country_Code", "Year")) %>%
+  inner_join(energy_long, by = c("Country_Name", "Country_Code", "Year"))
+
+# Viewing the first few rows of the merged dataset
+head(merged_data)
+
+# Renaming the columns after merging based on the actual names
+merged_data <- merged_data %>%
+  rename(GDP = `Value`,               # GDP corresponds to "Value"
+         CO2_Emissions = `Value.x`,   # CO2 emissions corresponds to "Value.x"
+         Energy_Use = `Value.y`)      # Energy use corresponds to "Value.y"
+
+# Step 2: View the renamed dataset
+head(merged_data)
+```
+
+```{r}
+# Removing rows with any missing values
+cleaned_merged_data <- na.omit(merged_data)
+
+# Check if missing data is gone
+sum(is.na(cleaned_merged_data))  # 0 is returned if all missing data is removed
+
+# Check the dimensions of the cleaned data
+dim(cleaned_merged_data)
+
+# Preview the first few rows of the cleaned dataset
+head(cleaned_merged_data)
+
+```
+
+```{r}
+library(VIM)
+aggr(cleaned_merged_data, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(cleaned_merged_data), cex.axis=.7, gap=3, ylab=c("Missing data","Pattern"))
+
+# Summary statistics for the dataset
+summary(cleaned_merged_data)
+
+```
+
+```{r}
+
+#GDP per Capita and CO2 Emissions:**
+
+library(ggplot2)
+ggplot(cleaned_merged_data, aes(x = GDP, y = CO2_Emissions)) +
+  geom_point() +
+  geom_smooth(method = 'lm', col = 'red') + 
+  labs(title = "GDP per Capita vs CO2 Emissions", x = "GDP per Capita", y = "CO2 Emissions per Capita")
+
+```
+
+```{r}
+# Basic scatter plot for GDP per capita vs CO2 emissions per capita
+library(ggplot2)
+
+ggplot(cleaned_merged_data, aes(x = GDP, y = CO2_Emissions)) +
+  geom_point(alpha = 0.6, color = "blue") +
+  labs(title = "Scatter Plot of GDP per Capita vs CO2 Emissions per Capita",
+       x = "GDP per Capita", y = "CO2 Emissions per Capita") +
+  theme_minimal()
+
+```
+
+```{r}
+# Scatter plot colored by income group
+ggplot(cleaned_merged_data, aes(x = GDP , y = CO2_Emissions, color = Country_Name)) +
+  geom_point(alpha = 0.6) +
+  labs(title = "GDP per Capita vs CO2 Emissions (by Country)",
+       x = "GDP per Capita", y = "CO2 Emissions") +
+  theme_minimal()
+
+```
+
+```{r}
+# Time-series plot for a specific country (United States)
+country_data <- subset(cleaned_merged_data, Country_Name == "United States")
+
+ggplot(Country_Name, aes(x = Year)) +
+  geom_line(aes(y = GDP, color = "GDP per Capita")) +
+  geom_line(aes(y = CO2_Emission, color = "CO2 Emissions")) +
+  labs(title = "GDP per Capita and CO2 Emissions Over Time (USA)",
+       y = "Value", x = "Year") +
+  scale_color_manual(values = c("GDP per Capita" = "blue", "CO2 Emissions" = "red")) +
+  theme_minimal()
+
+```
+
+```{r}
+ggplot(cleaned_merged_data, aes(x = GPD, y = CO2_Emissions)) +
+  geom_point(aes(color = Country_Name)) +
+  scale_x_log10() + 
+  labs(title = "CO2 Emissions vs GDP per Capita", 
+       x = "GDP per Capita (Log Scale)", 
+       y = "CO2 Emissions per Capita", color = "Continent") +
+  theme_minimal()
+
+```
+
+```{r}
+ggplot(cleaned_merged_data %>% filter(country %in% c("USA", "China", "Germany", "India")),
+       aes(x = year, y = CO2_emissions, color = country)) +
+  geom_line() +
+  facet_wrap(~country, scales = "free_y") +
+  labs(title = "CO2 Emissions over Time for Selected Countries", 
+       x = "Year", y = "CO2 Emissions") +
+  theme_minimal()
+
+```
+
+```{r}
+top_emitters <- data %>% 
+  group_by(country) %>% 
+  summarize(total_emissions = sum(co2_emissions), total_gdp = sum(gdp)) %>%
+  top_n(10, wt = total_emissions)
+
+ggplot(top_emitters, aes(x = reorder(country, total_emissions), y = total_emissions)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(title = "Top 10 CO2 Emitters", x = "Country", y = "Total CO2 Emissions") +
+  coord_flip() +
+  theme_minimal()
+
+```
+
+```{r}
+world_map <- map_data("world")
+data_map <- merge(world_map, data, by.x = "region", by.y = "country")
+
+ggplot(data_map, aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill = co2_emissions), color = "white") +
+  coord_fixed(1.3) +
+  scale_fill_gradient(low = "yellow", high = "red") +
+  labs(title = "World CO2 Emissions by Country", 
+       fill = "CO2 Emissions") +
+  theme_void()
+
+```
+
+```{r}
+library(gganimate)
+
+ggplot(data, aes(x = gdp_per_capita, y = co2_emissions_per_capita, color = continent)) +
+  geom_point() +
+  transition_time(year) +
+  labs(title = "CO2 Emissions vs GDP per Capita Over Time",
+       subtitle = "Year: {frame_time}",
+       x = "GDP per Capita", y = "CO2 Emissions") +
+  theme_minimal()
+
+```
+
+```{r}
+ggplot(data, aes(x = energy_use_per_capita, y = co2_emissions_per_capita, color = region)) +
+  geom_point(size = 3) +
+  labs(title = "CO2 Emissions vs Energy Use per Capita", 
+       x = "Energy Use per Capita", 
+       y = "CO2 Emissions per Capita") +
+  theme_minimal()
+
+```
+
+```{r}
+# Assuming your dataset is named 'df'
+write.csv(merged_data, "global trends.csv", row.names = FALSE)  # row.names = FALSE to exclude row numbers
+
+```
